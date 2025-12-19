@@ -3,6 +3,10 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const SubCategory = require("../models/subcategoryModel");
 
+exports.setCategoryIdToBody = (req, res, next) => {
+  if (!req.body.category) req.body.category = req.params.categoryId;
+  next();
+};
 exports.createSubCategory = asyncHandler(async (req, res) => {
   const { name, category } = req.body;
   const subCategory = await SubCategory.create({
@@ -29,11 +33,11 @@ exports.getSubCategories = asyncHandler(async (req, res) => {
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 5;
   const skip = (page - 1) * limit;
-
+  console.log(req.params);
   const subCategories = await SubCategory.find(req.filterObj)
     .skip(skip)
-    .limit(limit);
-  // .populate({ path: 'category', select: 'name -_id' });
+    .limit(limit)
+    .populate({ path: "category", select: "name -_id" });
 
   res
     .status(200)
