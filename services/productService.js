@@ -4,14 +4,31 @@ const ApiError = require("../utils/apiError");
 const productModel = require("../models/productModel");
 
 exports.getProducts = asyncHandler(async (req, res) => {
+  //filtering
+  const querySring = { ...req.query };
+  const excludeFields = ["page", "sort", "limit", "fields"];
+  excludeFields.forEach((field) => delete querySring[field]);
+  //apply filter by greater than or other
+  let queryStr = JSON.stringify(querySring);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  console.log(queryStr);
+  //pagination
   const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
+  const limit = req.query.limit * 1 || 50;
   const skip = (page - 1) * limit;
-  const products = await productModel
-    .find({})
+  //build query
+  const mongooseQuery = productModel
+    .find(JSON.parse(queryStr))
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
+  //excute query
+  const products = await mongooseQuery;
+  // const products = await productModel
+  //   .find(querySring)
+  //   .skip(skip)
+  //   .limit(limit)
+  //   .populate({ path: "category", select: "name" });
   res.status(200).json({ results: products.length, page, data: products });
 });
 
