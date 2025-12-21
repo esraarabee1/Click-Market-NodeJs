@@ -6,7 +6,7 @@ const productModel = require("../models/productModel");
 exports.getProducts = asyncHandler(async (req, res) => {
   //filtering
   const querySring = { ...req.query };
-  const excludeFields = ["page", "sort", "limit", "fields"];
+  const excludeFields = ["page", "sort", "limit", "fields", "keyword"];
   excludeFields.forEach((field) => delete querySring[field]);
   //apply filter by greater than or other
   let queryStr = JSON.stringify(querySring);
@@ -17,18 +17,40 @@ exports.getProducts = asyncHandler(async (req, res) => {
   const limit = req.query.limit * 1 || 50;
   const skip = (page - 1) * limit;
   //build query
-  const mongooseQuery = productModel
+  let mongooseQuery = productModel
     .find(JSON.parse(queryStr))
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
+  //sorting
+  if (req.query.sort) {
+    // price, sold => [price,sold] => pricesold => price sold
+    const sortBy = req.query.sort.split(",").join(" ");
+    mongooseQuery = mongooseQuery.sort(sortBy);
+  } else {
+    mongooseQuery = mongooseQuery.sort("-createdAt");
+  }
+  //fields limiting
+  if (req.query.fields) {
+    //
+    const fields = req.query.fields.split(",").join(" ");
+    mongooseQuery = mongooseQuery.select(fields);
+  } else {
+    mongooseQuery = mongooseQuery.select("-__v");
+  }
+  //search
+  if (req.query.keyword) {
+    //
+    const query = {};
+    query.$or = [
+      { title: { $regex: req.query.keyword, $options: "i" } },
+      { description: { $regex: req.query.keyword, $options: "i" } },
+    ];
+    mongooseQuery = mongooseQuery.find(query);
+    console.log(query);
+  }
   //excute query
   const products = await mongooseQuery;
-  // const products = await productModel
-  //   .find(querySring)
-  //   .skip(skip)
-  //   .limit(limit)
-  //   .populate({ path: "category", select: "name" });
   res.status(200).json({ results: products.length, page, data: products });
 });
 
@@ -39,7 +61,7 @@ exports.getProduct = asyncHandler(async (req, res, next) => {
     .populate({ path: "category", select: "name" });
 
   if (!product) {
-    // return res.status(404).json({ msg: `No category found for ID ${id}` });
+    // return res.status(404).json({ msg: `No product found for ID ${id}` });
     return next(new ApiError(`No product for this id ${id}`, 404));
   }
 
