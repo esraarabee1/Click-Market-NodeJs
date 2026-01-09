@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const productModel = require("../models/productModel");
 const ApiFeatures = require("../utils/apiFeatures");
-
+const factory = require("./handlersFactory");
 exports.getProducts = asyncHandler(async (req, res) => {
   //filtering
   // const querySring = { ...req.query };
@@ -92,33 +92,35 @@ exports.createProduct = asyncHandler(async (req, res) => {
 // @desc    Update specific category
 // @route   PUT /api/v1/categories/:id
 // @access  Private
-exports.updateProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
+exports.updateProduct = factory.updateOne(productModel);
+// exports.updateProduct = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
 
-  if (req.body.title) {
-    req.body.slug = slugify(req.body.title);
-  }
-  const product = await productModel.findOneAndUpdate({ _id: id }, req.body, {
-    new: true,
-  });
+//   if (req.body.title) {
+//     req.body.slug = slugify(req.body.title);
+//   }
+//   const product = await productModel.findOneAndUpdate({ _id: id }, req.body, {
+//     new: true,
+//   });
 
-  if (!product) {
-    //res.status(404).json({ msg: `No product for this id ${id}` });
-    return next(new ApiError(`No product for this id ${id}`, 404));
-  }
-  res.status(200).json({ data: product });
-});
+//   if (!product) {
+//     //res.status(404).json({ msg: `No product for this id ${id}` });
+//     return next(new ApiError(`No product for this id ${id}`, 404));
+//   }
+//   res.status(200).json({ data: product });
+// });
 
 // @desc    Delete specific product
 // @route   DELETE /api/v1/products/:id
 // @access  Private
-exports.deleteProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const product = await productModel.findByIdAndDelete(id);
+exports.deleteProduct = factory.deleteOne(productModel);
+// exports.deleteProduct = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const product = await productModel.findByIdAndDelete(id);
 
-  if (!product) {
-    //res.status(404).json({ msg: `No product for this id ${id}` });
-    return next(new ApiError(`No product for this id ${id}`, 404));
-  }
-  res.status(204).send();
-});
+//   if (!product) {
+//     //res.status(404).json({ msg: `No product for this id ${id}` });
+//     return next(new ApiError(`No product for this id ${id}`, 404));
+//   }
+//   res.status(204).send();
+// });

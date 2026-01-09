@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const brandModel = require("../models/brandModel");
 const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
 exports.getBrands = asyncHandler(async (req, res) => {
   //build query
   const documentsCount = await brandModel.countDocuments();
@@ -48,33 +49,35 @@ exports.createBrand = asyncHandler(async (req, res) => {
 // @desc    Update specific category
 // @route   PUT /api/v1/categories/:id
 // @access  Private
-exports.updateBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
+exports.updateBrand = factory.updateOne(brandModel);
+// exports.updateBrand = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const { name } = req.body;
 
-  const brand = await brandModel.findOneAndUpdate(
-    { _id: id },
-    { name, slug: slugify(name) },
-    { new: true }
-  );
+//   const brand = await brandModel.findOneAndUpdate(
+//     { _id: id },
+//     { name, slug: slugify(name) },
+//     { new: true }
+//   );
 
-  if (!brand) {
-    //res.status(404).json({ msg: `No category for this id ${id}` });
-    return next(new ApiError(`No brand for this id ${id}`, 404));
-  }
-  res.status(200).json({ data: brand });
-});
+//   if (!brand) {
+//     //res.status(404).json({ msg: `No category for this id ${id}` });
+//     return next(new ApiError(`No brand for this id ${id}`, 404));
+//   }
+//   res.status(200).json({ data: brand });
+// });
 
 // @desc    Delete specific category
 // @route   DELETE /api/v1/categories/:id
 // @access  Private
-exports.deleteBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const brand = await brandModel.findByIdAndDelete(id);
+exports.deleteBrand = factory.deleteOne(brandModel);
+// exports.deleteBrand = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const brand = await brandModel.findByIdAndDelete(id);
 
-  if (!brand) {
-    //res.status(404).json({ msg: `No category for this id ${id}` });
-    return next(new ApiError(`No brand for this id ${id}`, 404));
-  }
-  res.status(204).send();
-});
+//   if (!brand) {
+//     //res.status(404).json({ msg: `No category for this id ${id}` });
+//     return next(new ApiError(`No brand for this id ${id}`, 404));
+//   }
+//   res.status(204).send();
+// });
