@@ -4,8 +4,28 @@ const ApiError = require("../utils/apiError");
 const CategoryModel = require("../models/categoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
+const multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
+
+//disk storage
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/categories");
+  },
+  filename: function (req, file, cb) {
+    const ext = file.mimetype.split("/")[1];
+    const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
+    cb(null, filename);
+  },
+});
+
+const upload = multer({ storage: multerStorage });
+
+// Upload single image
+exports.uploadCategoryImage = upload.single("image");
 
 exports.getCategories = factory.getAll(CategoryModel);
+
 // exports.getCategories = asyncHandler(async (req, res) => {
 //   // const page = req.query.page * 1 || 1;
 //   // const limit = req.query.limit * 1 || 5;

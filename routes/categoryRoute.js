@@ -6,7 +6,9 @@ const {
   createCategory,
   updateCategory,
   deleteCategory,
+  uploadCategoryImage,
 } = require("../services/categoryService");
+
 const {
   getCategoryValidator,
   createCategoryValidator,
@@ -16,10 +18,17 @@ const {
 const subcategoriesRoute = require("../routes/subCategoryRoute");
 const router = express.Router();
 router.use("/:categoryId/subcategories", subcategoriesRoute);
-router
-  .route("/")
-  .get(getCategories)
-  .post(createCategoryValidator, createCategory);
+router.route("/").get(getCategories).post(
+  uploadCategoryImage,
+  // function (req, res, next) {
+  //   // req.files is array of `photos` files
+  //   // req.body will contain the text fields, if there were any
+  //   console.log(req.file);
+  //   next();
+  // },
+  createCategoryValidator,
+  createCategory
+);
 router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
