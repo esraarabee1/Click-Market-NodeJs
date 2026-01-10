@@ -13,12 +13,17 @@ exports.createSubCategoryValidator = [
     .isLength({ min: 2 })
     .withMessage("Too short category name")
     .isLength({ max: 32 })
-    .withMessage("Too long category name"),
+    .withMessage("Too long category name")
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val);
+      return true;
+    }),
   check("category")
     .notEmpty()
     .withMessage("subCategory must be belong to category")
     .isMongoId()
     .withMessage("Invalid Category id format"),
+
   validatorMiddleware,
 ];
 

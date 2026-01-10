@@ -8,15 +8,16 @@ exports.setCategoryIdToBody = (req, res, next) => {
   if (!req.body.category) req.body.category = req.params.categoryId;
   next();
 };
-exports.createSubCategory = asyncHandler(async (req, res) => {
-  const { name, category } = req.body;
-  const subCategory = await SubCategory.create({
-    name,
-    slug: slugify(name),
-    category,
-  });
-  res.status(201).json({ data: subCategory });
-});
+exports.createSubCategory = factory.createOne(SubCategory);
+// exports.createSubCategory = asyncHandler(async (req, res) => {
+//   const { name, category } = req.body;
+//   const subCategory = await SubCategory.create({
+//     name,
+//     slug: slugify(name),
+//     category,
+//   });
+//   res.status(201).json({ data: subCategory });
+// });
 
 // Nested route
 // GET /api/v1/categories/:categoryId/subcategories
@@ -30,46 +31,49 @@ exports.createFilterObj = (req, res, next) => {
 // @desc    Get list of subcategories
 // @route   GET /api/v1/subcategories
 // @access  Public
-exports.getSubCategories = asyncHandler(async (req, res) => {
-  //build query
-  const documentsCount = await SubCategory.countDocuments();
-  const apiFeatures = new ApiFeatures(SubCategory.find(), req.query)
-    .paginate(documentsCount)
-    .filter()
-    .search()
-    .limitFields()
-    .sort();
-  //excute query
-  const { mongooseQuery, paginationResult } = apiFeatures;
-  const subCategories = await mongooseQuery;
-  // const page = req.query.page * 1 || 1;
-  // const limit = req.query.limit * 1 || 5;
-  // const skip = (page - 1) * limit;
-  console.log(req.params);
-  // const subCategories = await SubCategory.find(req.filterObj)
-  //   .skip(skip)
-  //   .limit(limit)
-  //   .populate({ path: "category", select: "name -_id" });
+exports.getSubCategories = factory.getAll(SubCategory);
 
-  res.status(200).json({
-    results: subCategories.length,
-    paginationResult,
-    data: subCategories,
-  });
-});
+// exports.getSubCategories = asyncHandler(async (req, res) => {
+//   //build query
+//   const documentsCount = await SubCategory.countDocuments();
+//   const apiFeatures = new ApiFeatures(SubCategory.find(), req.query)
+//     .paginate(documentsCount)
+//     .filter()
+//     .search()
+//     .limitFields()
+//     .sort();
+//   //excute query
+//   const { mongooseQuery, paginationResult } = apiFeatures;
+//   const subCategories = await mongooseQuery;
+//   // const page = req.query.page * 1 || 1;
+//   // const limit = req.query.limit * 1 || 5;
+//   // const skip = (page - 1) * limit;
+//   console.log(req.params);
+//   // const subCategories = await SubCategory.find(req.filterObj)
+//   //   .skip(skip)
+//   //   .limit(limit)
+//   //   .populate({ path: "category", select: "name -_id" });
+
+//   res.status(200).json({
+//     results: subCategories.length,
+//     paginationResult,
+//     data: subCategories,
+//   });
+// });
 
 // @desc    Get specific subcategory by id
 // @route   GET /api/v1/subcategories/:id
 // @access  Public
-exports.getSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const subCategory = await SubCategory.findById(id);
+exports.getSubCategory = factory.getOne(SubCategory);
+// exports.getSubCategory = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const subCategory = await SubCategory.findById(id);
 
-  if (!subCategory) {
-    return next(new ApiError(`No subcategory for this id ${id}`, 404));
-  }
-  res.status(200).json({ data: subCategory });
-});
+//   if (!subCategory) {
+//     return next(new ApiError(`No subcategory for this id ${id}`, 404));
+//   }
+//   res.status(200).json({ data: subCategory });
+// });
 
 // @desc    Update specific subcategory
 // @route   PUT /api/v1/subcategories/:id

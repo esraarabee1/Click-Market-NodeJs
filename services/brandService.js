@@ -4,47 +4,52 @@ const ApiError = require("../utils/apiError");
 const brandModel = require("../models/brandModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
-exports.getBrands = asyncHandler(async (req, res) => {
-  //build query
-  const documentsCount = await brandModel.countDocuments();
-  const apiFeatures = new ApiFeatures(brandModel.find(), req.query)
-    .paginate(documentsCount)
-    .filter()
-    .search()
-    .limitFields()
-    .sort();
-  //excute query
-  const { mongooseQuery, paginationResult } = apiFeatures;
-  const brands = await mongooseQuery;
-  // const page = req.query.page * 1 || 1;
-  // const limit = req.query.limit * 1 || 5;
-  // const skip = (page - 1) * limit;
-  // const brands = await brandModel.find({});
-  res
-    .status(200)
-    .json({ results: brands.length, paginationResult, data: brands });
-});
 
-exports.getBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const brand = await brandModel.findById(id);
-  console.log(brand, "brand");
+exports.getBrands = factory.getAll(brandModel);
+// exports.getBrands = asyncHandler(async (req, res) => {
+//   //build query
+//   const documentsCount = await brandModel.countDocuments();
+//   const apiFeatures = new ApiFeatures(brandModel.find(), req.query)
+//     .paginate(documentsCount)
+//     .filter()
+//     .search()
+//     .limitFields()
+//     .sort();
+//   //excute query
+//   const { mongooseQuery, paginationResult } = apiFeatures;
+//   const brands = await mongooseQuery;
+//   // const page = req.query.page * 1 || 1;
+//   // const limit = req.query.limit * 1 || 5;
+//   // const skip = (page - 1) * limit;
+//   // const brands = await brandModel.find({});
+//   res
+//     .status(200)
+//     .json({ results: brands.length, paginationResult, data: brands });
+// });
 
-  if (!brand) {
-    // return res.status(404).json({ msg: `No category found for ID ${id}` });
-    return next(new ApiError(`No brand for this id ${id}`, 404));
-  }
+exports.getBrand = factory.getOne(brandModel);
+// exports.getBrand = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const brand = await brandModel.findById(id);
+//   console.log(brand, "brand");
 
-  res.status(200).json({ data: brand });
-});
+//   if (!brand) {
+//     // return res.status(404).json({ msg: `No category found for ID ${id}` });
+//     return next(new ApiError(`No brand for this id ${id}`, 404));
+//   }
 
-exports.createBrand = asyncHandler(async (req, res) => {
-  const name = req.body.name;
-  //async await
+//   res.status(200).json({ data: brand });
+// });
 
-  const category = await brandModel.create({ name, slug: slugify(name) });
-  res.status(201).json({ data: category });
-});
+exports.createBrand = factory.createOne(brandModel);
+
+// exports.createBrand = asyncHandler(async (req, res) => {
+//   const name = req.body.name;
+//   //async await
+
+//   const category = await brandModel.create({ name, slug: slugify(name) });
+//   res.status(201).json({ data: category });
+// });
 
 // @desc    Update specific category
 // @route   PUT /api/v1/categories/:id

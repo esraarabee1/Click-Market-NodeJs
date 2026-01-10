@@ -4,90 +4,96 @@ const ApiError = require("../utils/apiError");
 const productModel = require("../models/productModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
-exports.getProducts = asyncHandler(async (req, res) => {
-  //filtering
-  // const querySring = { ...req.query };
-  // const excludeFields = ["page", "sort", "limit", "fields", "keyword"];
-  // excludeFields.forEach((field) => delete querySring[field]);
-  // //apply filter by greater than or other
-  // let queryStr = JSON.stringify(querySring);
-  // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  // console.log(queryStr);
-  //pagination
-  // const page = req.query.page * 1 || 1;
-  // const limit = req.query.limit * 1 || 50;
-  // const skip = (page - 1) * limit;
 
-  //build query
-  const documentsCount = await productModel.countDocuments();
-  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
-    .paginate(documentsCount)
-    .filter()
-    .search("Products")
-    .limitFields()
-    .sort();
+exports.getProducts = factory.getAll(productModel, "Products");
+// exports.getProducts = asyncHandler(async (req, res) => {
+//   //filtering
+//   // const querySring = { ...req.query };
+//   // const excludeFields = ["page", "sort", "limit", "fields", "keyword"];
+//   // excludeFields.forEach((field) => delete querySring[field]);
+//   // //apply filter by greater than or other
+//   // let queryStr = JSON.stringify(querySring);
+//   // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+//   // console.log(queryStr);
+//   //pagination
+//   // const page = req.query.page * 1 || 1;
+//   // const limit = req.query.limit * 1 || 50;
+//   // const skip = (page - 1) * limit;
 
-  const { mongooseQuery, paginationResult } = apiFeatures;
-  // let mongooseQuery = productModel
-  //   .find(JSON.parse(queryStr))
-  //   .skip(skip)
-  //   .limit(limit)
-  //   .populate({ path: "category", select: "name" });
-  //sorting
-  // if (req.query.sort) {
-  //   // price, sold => [price,sold] => pricesold => price sold
-  //   const sortBy = req.query.sort.split(",").join(" ");
-  //   mongooseQuery = mongooseQuery.sort(sortBy);
-  // } else {
-  //   mongooseQuery = mongooseQuery.sort("-createdAt");
-  // }
-  //fields limiting
-  // if (req.query.fields) {
-  //   //
-  //   const fields = req.query.fields.split(",").join(" ");
-  //   mongooseQuery = mongooseQuery.select(fields);
-  // } else {
-  //   mongooseQuery = mongooseQuery.select("-__v");
-  // }
-  //search
-  // if (req.query.keyword) {
-  //   //
-  //   const query = {};
-  //   query.$or = [
-  //     { title: { $regex: req.query.keyword, $options: "i" } },
-  //     { description: { $regex: req.query.keyword, $options: "i" } },
-  //   ];
-  //   mongooseQuery = mongooseQuery.find(query);
-  //   console.log(query);
-  // }
-  //excute query
-  const products = await mongooseQuery;
-  res
-    .status(200)
-    .json({ results: products.length, paginationResult, data: products });
-});
+//   //build query
+//   const documentsCount = await productModel.countDocuments();
+//   const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+//     .paginate(documentsCount)
+//     .filter()
+//     .search("Products")
+//     .limitFields()
+//     .sort();
 
-exports.getProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const product = await productModel
-    .findById(id)
-    .populate({ path: "category", select: "name" });
+//   const { mongooseQuery, paginationResult } = apiFeatures;
+//   // let mongooseQuery = productModel
+//   //   .find(JSON.parse(queryStr))
+//   //   .skip(skip)
+//   //   .limit(limit)
+//   //   .populate({ path: "category", select: "name" });
+//   //sorting
+//   // if (req.query.sort) {
+//   //   // price, sold => [price,sold] => pricesold => price sold
+//   //   const sortBy = req.query.sort.split(",").join(" ");
+//   //   mongooseQuery = mongooseQuery.sort(sortBy);
+//   // } else {
+//   //   mongooseQuery = mongooseQuery.sort("-createdAt");
+//   // }
+//   //fields limiting
+//   // if (req.query.fields) {
+//   //   //
+//   //   const fields = req.query.fields.split(",").join(" ");
+//   //   mongooseQuery = mongooseQuery.select(fields);
+//   // } else {
+//   //   mongooseQuery = mongooseQuery.select("-__v");
+//   // }
+//   //search
+//   // if (req.query.keyword) {
+//   //   //
+//   //   const query = {};
+//   //   query.$or = [
+//   //     { title: { $regex: req.query.keyword, $options: "i" } },
+//   //     { description: { $regex: req.query.keyword, $options: "i" } },
+//   //   ];
+//   //   mongooseQuery = mongooseQuery.find(query);
+//   //   console.log(query);
+//   // }
+//   //excute query
+//   const products = await mongooseQuery;
+//   res
+//     .status(200)
+//     .json({ results: products.length, paginationResult, data: products });
+// });
 
-  if (!product) {
-    // return res.status(404).json({ msg: `No product found for ID ${id}` });
-    return next(new ApiError(`No product for this id ${id}`, 404));
-  }
+exports.getProduct = factory.getOne(productModel);
 
-  res.status(200).json({ data: product });
-});
+// exports.getProduct = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const product = await productModel
+//     .findById(id)
+//     .populate({ path: "category", select: "name" });
 
-exports.createProduct = asyncHandler(async (req, res) => {
-  req.body.slug = slugify(req.body.title);
-  //async await
+//   if (!product) {
+//     // return res.status(404).json({ msg: `No product found for ID ${id}` });
+//     return next(new ApiError(`No product for this id ${id}`, 404));
+//   }
 
-  const product = await productModel.create(req.body);
-  res.status(201).json({ data: product });
-});
+//   res.status(200).json({ data: product });
+// });
+
+exports.createProduct = factory.createOne(productModel);
+
+// exports.createProduct = asyncHandler(async (req, res) => {
+//   req.body.slug = slugify(req.body.title);
+//   //async await
+
+//   const product = await productModel.create(req.body);
+//   res.status(201).json({ data: product });
+// });
 
 // @desc    Update specific category
 // @route   PUT /api/v1/categories/:id

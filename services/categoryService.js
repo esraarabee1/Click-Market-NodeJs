@@ -4,47 +4,52 @@ const ApiError = require("../utils/apiError");
 const CategoryModel = require("../models/categoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
-exports.getCategories = asyncHandler(async (req, res) => {
-  // const page = req.query.page * 1 || 1;
-  // const limit = req.query.limit * 1 || 5;
-  // const skip = (page - 1) * limit;
-  //build query
-  const documentsCount = await CategoryModel.countDocuments();
-  const apiFeatures = new ApiFeatures(CategoryModel.find(), req.query)
-    .paginate(documentsCount)
-    .filter()
-    .search()
-    .limitFields()
-    .sort();
-  //excute query
-  const { mongooseQuery, paginationResult } = apiFeatures;
-  const categories = await mongooseQuery;
-  // const categories = await CategoryModel.find({}).skip(skip).limit(limit);
-  res
-    .status(200)
-    .json({ results: categories.length, paginationResult, data: categories });
-});
 
-exports.getCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await CategoryModel.findById(id);
-  console.log(category, "category");
+exports.getCategories = factory.getAll(CategoryModel);
+// exports.getCategories = asyncHandler(async (req, res) => {
+//   // const page = req.query.page * 1 || 1;
+//   // const limit = req.query.limit * 1 || 5;
+//   // const skip = (page - 1) * limit;
+//   //build query
+//   const documentsCount = await CategoryModel.countDocuments();
+//   const apiFeatures = new ApiFeatures(CategoryModel.find(), req.query)
+//     .paginate(documentsCount)
+//     .filter()
+//     .search()
+//     .limitFields()
+//     .sort();
+//   //excute query
+//   const { mongooseQuery, paginationResult } = apiFeatures;
+//   const categories = await mongooseQuery;
+//   // const categories = await CategoryModel.find({}).skip(skip).limit(limit);
+//   res
+//     .status(200)
+//     .json({ results: categories.length, paginationResult, data: categories });
+// });
 
-  if (!category) {
-    // return res.status(404).json({ msg: `No category found for ID ${id}` });
-    return next(new ApiError(`No category for this id ${id}`, 404));
-  }
+exports.getCategory = factory.getOne(CategoryModel);
 
-  res.status(200).json({ data: category });
-});
+// exports.getCategory = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const category = await CategoryModel.findById(id);
+//   console.log(category, "category");
 
-exports.createCategory = asyncHandler(async (req, res) => {
-  const name = req.body.name;
-  //async await
+//   if (!category) {
+//     // return res.status(404).json({ msg: `No category found for ID ${id}` });
+//     return next(new ApiError(`No category for this id ${id}`, 404));
+//   }
 
-  const category = await CategoryModel.create({ name, slug: slugify(name) });
-  res.status(201).json({ data: category });
-});
+//   res.status(200).json({ data: category });
+// });
+
+exports.createCategory = factory.createOne(CategoryModel);
+// exports.createCategory = asyncHandler(async (req, res) => {
+//   const name = req.body.name;
+//   //async await
+
+//   const category = await CategoryModel.create({ name, slug: slugify(name) });
+//   res.status(201).json({ data: category });
+// });
 
 // @desc    Update specific category
 // @route   PUT /api/v1/categories/:id
