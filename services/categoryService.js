@@ -19,7 +19,15 @@ const multerStorage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: multerStorage });
+const multerFilter = function (req, file, cb) {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new ApiError("Only Images allowed", 400), false);
+  }
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 // Upload single image
 exports.uploadCategoryImage = upload.single("image");
