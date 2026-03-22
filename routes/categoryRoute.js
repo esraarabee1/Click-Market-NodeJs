@@ -7,6 +7,7 @@ const {
   updateCategory,
   deleteCategory,
   uploadCategoryImage,
+  resizeImage,
 } = require("../services/categoryService");
 
 const {
@@ -20,6 +21,7 @@ const router = express.Router();
 router.use("/:categoryId/subcategories", subcategoriesRoute);
 router.route("/").get(getCategories).post(
   uploadCategoryImage,
+  resizeImage,
   // function (req, res, next) {
   //   // req.files is array of `photos` files
   //   // req.body will contain the text fields, if there were any

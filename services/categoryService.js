@@ -5,19 +5,23 @@ const CategoryModel = require("../models/categoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
 const multer = require("multer");
+const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 
-//disk storage
-const multerStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/categories");
-  },
-  filename: function (req, file, cb) {
-    const ext = file.mimetype.split("/")[1];
-    const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
-    cb(null, filename);
-  },
-});
+//1- disk storage
+// const multerStorage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "uploads/categories");
+//   },
+//   filename: function (req, file, cb) {
+//     const ext = file.mimetype.split("/")[1];
+//     const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
+//     cb(null, filename);
+//   },
+// });
+
+//2- memory storage
+const multerStorage = multer.memoryStorage();
 
 const multerFilter = function (req, file, cb) {
   if (file.mimetype.startsWith("image")) {
@@ -31,6 +35,22 @@ const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 // Upload single image
 exports.uploadCategoryImage = upload.single("image");
+
+// Image processing
+exports.resizeImage = asyncHandler(async (req, res, next) => {
+  const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
+
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 95 })
+    .toFile(`uploads/categories/${filename}`);
+
+  // Save image into our db
+  // req.body.image = filename;
+
+  next();
+});
 
 exports.getCategories = factory.getAll(CategoryModel);
 
