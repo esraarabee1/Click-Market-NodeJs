@@ -7,7 +7,7 @@ const factory = require("./handlersFactory");
 const multer = require("multer");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
-
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 //1- disk storage
 // const multerStorage = multer.diskStorage({
 //   destination: function (req, file, cb) {
@@ -21,20 +21,20 @@ const { v4: uuidv4 } = require("uuid");
 // });
 
 //2- memory storage
-const multerStorage = multer.memoryStorage();
+// const multerStorage = multer.memoryStorage();
 
-const multerFilter = function (req, file, cb) {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
-    cb(new ApiError("Only Images allowed", 400), false);
-  }
-};
+// const multerFilter = function (req, file, cb) {
+//   if (file.mimetype.startsWith("image")) {
+//     cb(null, true);
+//   } else {
+//     cb(new ApiError("Only Images allowed", 400), false);
+//   }
+// };
 
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+// const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
-// Upload single image
-exports.uploadCategoryImage = upload.single("image");
+// // Upload single image
+exports.uploadCategoryImage = uploadSingleImage("image");
 
 // Image processing
 exports.resizeImage = asyncHandler(async (req, res, next) => {
