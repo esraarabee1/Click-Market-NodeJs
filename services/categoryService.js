@@ -47,7 +47,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     .toFile(`uploads/categories/${filename}`);
 
   // Save image into our db
-  // req.body.image = filename;
+  req.body.image = filename;
 
   next();
 });

@@ -1,3 +1,5 @@
+const path = require("path");
+
 const express = require("express");
 const dotenv = require("dotenv");
 const ApiError = require("./utils/apiError");
@@ -14,7 +16,7 @@ const productRoute = require("./routes/productRoute");
 dbConnection();
 
 const app = express();
-
+app.use(express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 
 if (process.env.NODE_ENV == "development") {
