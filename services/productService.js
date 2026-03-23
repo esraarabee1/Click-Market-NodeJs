@@ -7,6 +7,7 @@ const factory = require("./handlersFactory");
 const multer = require("multer");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
+const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 //2- memory storage
 const multerStorage = multer.memoryStorage();
 
@@ -19,7 +20,7 @@ const multerFilter = function (req, file, cb) {
 };
 
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
-exports.uploadProductsImages = upload.fields([
+exports.uploadProductsImages = uploadMixOfImages([
   {
     name: "imageCover",
     maxCount: 1,

@@ -1,7 +1,23 @@
 const multer = require("multer");
 const ApiError = require("../utils/apiError");
 
+const multerOptions = () => {
+  const multerStorage = multer.memoryStorage();
+
+  const multerFilter = function (req, file, cb) {
+    if (file.mimetype.startsWith("image")) {
+      cb(null, true);
+    } else {
+      cb(new ApiError("Only Images allowed", 400), false);
+    }
+  };
+
+  const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+  return upload;
+};
 exports.uploadSingleImage = (fieldName) => {
+  return multerOptions().single(fieldName);
   //1- disk storage
   // const multerStorage = multer.diskStorage({
   //   destination: function (req, file, cb) {
@@ -15,17 +31,33 @@ exports.uploadSingleImage = (fieldName) => {
   // });
 
   //2- memory storage
-  const multerStorage = multer.memoryStorage();
+  // const multerStorage = multer.memoryStorage();
 
-  const multerFilter = function (req, file, cb) {
-    if (file.mimetype.startsWith("image")) {
-      cb(null, true);
-    } else {
-      cb(new ApiError("Only Images allowed", 400), false);
-    }
-  };
+  // const multerFilter = function (req, file, cb) {
+  //   if (file.mimetype.startsWith("image")) {
+  //     cb(null, true);
+  //   } else {
+  //     cb(new ApiError("Only Images allowed", 400), false);
+  //   }
+  // };
 
-  const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+  // const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
-  return upload.single(fieldName);
+  // return upload.single(fieldName);
+};
+exports.uploadMixOfImages = (arrayOfFields) => {
+  return multerOptions().fields(arrayOfFields);
+  //2- memory storage
+  // const multerStorage = multer.memoryStorage();
+
+  // const multerFilter = function (req, file, cb) {
+  //   if (file.mimetype.startsWith("image")) {
+  //     cb(null, true);
+  //   } else {
+  //     cb(new ApiError("Only Images allowed", 400), false);
+  //   }
+  // };
+
+  // const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+  // return upload.fields(arrayOfFields);
 };
