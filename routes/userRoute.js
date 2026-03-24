@@ -16,7 +16,7 @@ const {
   deleteUser,
   uploadUserImage,
   resizeImage,
-  //   changeUserPassword,
+  changeUserPassword,
   //   getLoggedUserData,
   //   updateLoggedUserPassword,
   //   updateLoggedUserData,
@@ -36,11 +36,11 @@ const router = express.Router();
 
 // Admin
 // router.use(authService.allowedTo('admin', 'manager'));
-// router.put(
-//   '/changePassword/:id',
-//   changeUserPasswordValidator,
-//   changeUserPassword
-// );
+router.put(
+  "/changePassword/:id",
+  //   changeUserPasswordValidator,
+  changeUserPassword
+);
 router
   .route("/")
   .get(getUsers)
