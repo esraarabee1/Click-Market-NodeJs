@@ -130,7 +130,7 @@ exports.getProducts = factory.getAll(productModel, "Products");
 //     .json({ results: products.length, paginationResult, data: products });
 // });
 
-exports.getProduct = factory.getOne(productModel);
+exports.getProduct = factory.getOne(productModel, "reviews");
 
 // exports.getProduct = asyncHandler(async (req, res, next) => {
 //   const { id } = req.params;
